@@ -13,33 +13,23 @@
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
     }
-    /* Perspective for flashcards */
-    .perspective {
-      perspective: 1000px;
-    }
-    .preserve-3d {
-      transform-style: preserve-3d;
-    }
-    .backface-hidden {
-      backface-visibility: hidden;
-    }
-    .rotate-y-180 {
-      transform: rotateY(180deg);
-    }
+    .perspective { perspective: 1000px; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
   </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "react-router-dom": "https://esm.sh/react-router-dom@7.1.5",
-    "date-fns": "https://esm.sh/date-fns@4.1.0",
-    "date-fns/": "https://esm.sh/date-fns@4.1.0/",
-    "date-fns/parseISO": "https://esm.sh/date-fns@4.1.0/parseISO",
+    "react": "https://esm.sh/react@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "date-fns": "https://esm.sh/date-fns@^4.1.0",
+    "date-fns/": "https://esm.sh/date-fns@^4.1.0/",
     "vite": "https://esm.sh/vite@^7.3.1",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
@@ -48,7 +38,7 @@
 </head>
 <body>
   <div id="root"></div>
-  <!-- index.tsx를 모듈로 로드합니다. -->
+  <!-- Vite가 이 파일을 인식하여 TSX를 JS로 변환해줍니다. -->
   <script type="module" src="./index.tsx"></script>
 </body>
 </html>
