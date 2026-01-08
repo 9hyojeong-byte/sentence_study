@@ -1,0 +1,5 @@
+{
+  "name": "English Snap - Sheets Learning",
+  "description": "A sophisticated English learning web application that uses Google Sheets as a database, featuring a visual calendar, flashcard study modes, and seamless data synchronization.",
+  "requestFramePermissions": []
+}
