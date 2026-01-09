@@ -5,6 +5,8 @@ export interface EnglishEntry {
   meaning: string;
   hint: string;
   referenceUrl: string;
+  check?: boolean;
+  bookmark?: boolean; // New bookmark status
   createdAt?: string;
 }
 

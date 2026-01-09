@@ -20,23 +20,29 @@ export const gasService = {
   },
 
   async addEntry(entry: EnglishEntry): Promise<void> {
-    if (GAS_WEB_APP_URL.includes('YOUR_GOOGLE_APPS_SCRIPT_URL_HERE')) {
-      console.warn('Please set GAS_WEB_APP_URL in constants.ts');
-      return;
-    }
-
     try {
-      const response = await fetch(GAS_WEB_APP_URL, {
+      await fetch(GAS_WEB_APP_URL, {
         method: 'POST',
-        mode: 'no-cors', // Standard fetch with GAS often requires no-cors if not handling headers perfectly
+        mode: 'no-cors',
         body: JSON.stringify(entry),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      // with no-cors, we can't read the response body, but usually it's fine for simple appends
     } catch (error) {
-      console.error('Error adding entry:', error);
+      console.error('Error adding/updating entry:', error);
+      throw error;
+    }
+  },
+
+  async toggleBookmark(date: string, sentence: string): Promise<void> {
+    try {
+      await fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ action: 'toggleBookmark', date, sentence }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
       throw error;
     }
   }

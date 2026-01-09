@@ -1,13 +1,7 @@
 
 /**
  * GOOGLE APPS SCRIPT CODE
- * 
- * 1. Open Google Sheets.
- * 2. Extensions -> Apps Script.
- * 3. Paste this code.
- * 4. Deploy -> New Deployment -> Web App.
- * 5. Set "Execute as: Me" and "Who has access: Anyone".
- * 6. Copy the Web App URL and paste it in `constants.ts` in the React app.
+ * Database for English Learning App
  */
 
 const SHEET_NAME = 'EnglishEntries';
@@ -17,8 +11,10 @@ function setup() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(['date', 'sentence', 'meaning', 'hint', 'referenceUrl', 'createdAt']);
+    // Columns: date, sentence, meaning, hint, referenceUrl, check, bookmark, createdAt
+    sheet.appendRow(['date', 'sentence', 'meaning', 'hint', 'referenceUrl', 'check', 'bookmark', 'createdAt']);
   }
+  return sheet;
 }
 
 function doGet() {
@@ -30,7 +26,12 @@ function doGet() {
   const result = data.map(row => {
     let obj = {};
     headers.forEach((header, i) => {
-      obj[header] = row[i];
+      let value = row[i];
+      // Convert 'TRUE'/'FALSE' strings or booleans to actual boolean for boolean fields
+      if (header === 'check' || header === 'bookmark') {
+        value = (value === true || value === 'TRUE' || value === 'true');
+      }
+      obj[header] = value;
     });
     return obj;
   });
@@ -44,15 +45,62 @@ function doPost(e) {
     const params = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName(SHEET_NAME) || setup();
+    const data = sheet.getDataRange().getValues();
     
-    sheet.appendRow([
-      params.date,
-      params.sentence,
-      params.meaning,
-      params.hint,
-      params.referenceUrl,
-      new Date().toISOString()
-    ]);
+    // Identification keys
+    const dateStr = String(params.date);
+    const sentenceStr = String(params.sentence);
+
+    // Find row index (1-based for Sheet, but data[0] is headers)
+    let foundIndex = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === dateStr && String(data[i][1]) === sentenceStr) {
+        foundIndex = i + 1;
+        break;
+      }
+    }
+
+    if (params.action === "toggleBookmark") {
+      if (foundIndex !== -1) {
+        // Bookmark is Column 7 (index 6 zero-based)
+        const currentVal = data[foundIndex - 1][6];
+        const newVal = !(currentVal === true || currentVal === 'TRUE' || currentVal === 'true');
+        sheet.getRange(foundIndex, 7).setValue(newVal);
+        return ContentService.createTextOutput(JSON.stringify({ status: 'success', newValue: newVal }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Entry not found' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Default Upsert Logic
+    const checkVal = params.check === true;
+    const bookmarkVal = params.bookmark === true;
+    
+    if (foundIndex !== -1) {
+      // Update existing row (Columns 1-7)
+      sheet.getRange(foundIndex, 1, 1, 7).setValues([[
+        params.date,
+        params.sentence,
+        params.meaning,
+        params.hint,
+        params.referenceUrl,
+        checkVal,
+        bookmarkVal
+      ]]);
+    } else {
+      // Append new row
+      sheet.appendRow([
+        params.date,
+        params.sentence,
+        params.meaning,
+        params.hint,
+        params.referenceUrl,
+        checkVal,
+        bookmarkVal,
+        new Date().toISOString()
+      ]);
+    }
     
     return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
       .setMimeType(ContentService.MimeType.JSON);

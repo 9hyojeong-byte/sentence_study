@@ -51,7 +51,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Home entries={entries} loading={isLoading} />} />
             <Route path="/add" element={<AddEntry onSave={refreshData} />} />
             <Route path="/list/:date" element={<DateList entries={entries} />} />
-            <Route path="/study/:date" element={<StudyView entries={entries} />} />
+            <Route path="/study/:date" element={<StudyView entries={entries} onRefresh={refreshData} />} />
           </Routes>
         </main>
       </div>
